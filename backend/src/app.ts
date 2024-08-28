@@ -1,21 +1,20 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
+import authRoutes from "./routes/auth";
+import taskRoutes from "./routes/tasks";
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Hello from Task Manager Backend!");
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes);
 
-app.listen(port, () => {
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
   console.log(
-    `Server running on port ${port}. Navigate to http://localhost:${port}`
+    `Server running on port ${PORT}. Navigate to http://localhost:${PORT}`
   );
 });
