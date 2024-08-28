@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "start": "bun run src/app.ts",
-    "dev": "bun --watch run src/app.ts"
+    "dev": "bun --watch run src/app.ts",
+    "db:generate": "bun run drizzle-kit generate",
+    "db:migrate": "bun run drizzle-kit migrate"
   },
   "devDependencies": {
     "@types/bun": "latest",
