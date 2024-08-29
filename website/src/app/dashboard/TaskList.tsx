@@ -8,14 +8,18 @@ import {
 } from "@hello-pangea/dnd";
 import { Task } from "@/types/Task";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import NewTaskDialog from "./NewTaskDialog";
+import TaskItem from "./TaskItem";
 
-const columns = [
+export const taskCategories = [
   { id: "todo", title: "To Do" },
   { id: "inprogress", title: "In Progress" },
   { id: "done", title: "Done" },
 ] as const;
 
-type Column = (typeof columns)[number]["id"];
+type Column = (typeof taskCategories)[number]["id"];
 
 interface TaskListProps {
   initialTasks: Task[];
@@ -23,7 +27,22 @@ interface TaskListProps {
 
 export default function TaskList({ initialTasks }: TaskListProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
   const { data: session } = useSession();
+
+  const handleAddTask = (newTask: Task) => {
+    setTasks([...tasks, newTask]);
+  };
+
+  const handleEditTask = (editedTask: Task) => {
+    setTasks(
+      tasks.map((task) => (task.id === editedTask.id ? editedTask : task))
+    );
+  };
+
+  const handleDeleteTask = (taskId: number) => {
+    setTasks(tasks.filter((task) => task.id !== taskId));
+  };
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -81,45 +100,56 @@ export default function TaskList({ initialTasks }: TaskListProps) {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex space-x-4">
-        {columns.map((column) => (
-          <div key={column.id} className="bg-white/10 p-4 rounded-lg w-1/3">
-            <h2 className="text-lg font-semibold mb-4">{column.title}</h2>
-            <Droppable droppableId={column.id}>
-              {(provided) => (
-                <ul
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="space-y-2 min-h-[100px]"
-                >
-                  {tasks
-                    .filter((task) => task.status === column.id)
-                    .map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id.toString()}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <li
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="bg-white/20 p-2 rounded shadow"
-                          >
-                            {task.title}
-                          </li>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
-                </ul>
-              )}
-            </Droppable>
-          </div>
-        ))}
+    <>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Tasks</h2>
+        <Button onClick={() => setIsNewTaskDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Add Task
+        </Button>
       </div>
-    </DragDropContext>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="flex space-x-4">
+          {taskCategories.map((column) => (
+            <div key={column.id} className="bg-white/10 p-4 rounded-lg w-1/3">
+              <h2 className="text-lg font-semibold mb-4">{column.title}</h2>
+              <Droppable droppableId={column.id}>
+                {(provided) => (
+                  <ul
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-2 min-h-[100px]"
+                  >
+                    {tasks
+                      .filter((task) => task.status === column.id)
+                      .map((task, index) => (
+                        <Draggable
+                          key={task.id}
+                          draggableId={task.id.toString()}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <TaskItem
+                              task={task}
+                              provided={provided}
+                              onEdit={handleEditTask}
+                              onDelete={handleDeleteTask}
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+                    {provided.placeholder}
+                  </ul>
+                )}
+              </Droppable>
+            </div>
+          ))}
+        </div>
+      </DragDropContext>
+      <NewTaskDialog
+        isOpen={isNewTaskDialogOpen}
+        onClose={() => setIsNewTaskDialogOpen(false)}
+        onAddTask={handleAddTask}
+      />
+    </>
   );
 }
