@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, Info } from "lucide-react";
+import { Pencil, Trash2, Info, Check, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "@/components/ui/use-toast";
 
@@ -18,6 +18,7 @@ interface TaskItemProps {
   onEdit: (task: Task) => void;
   onDelete: (taskId: number) => void;
   onOpenEditDialog: (task: Task) => void;
+  isUpdating: boolean;
 }
 
 export default function TaskItem({
@@ -26,6 +27,7 @@ export default function TaskItem({
   onEdit,
   onDelete,
   onOpenEditDialog,
+  isUpdating,
 }: TaskItemProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { data: session } = useSession();
@@ -74,10 +76,16 @@ export default function TaskItem({
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
-        className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg"
+        className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg relative"
       >
         <span className="font-medium truncate">{task.title}</span>
         <div className="flex space-x-1">
+          {isUpdating ? (
+            <div className="absolute inset-0 bg-black bg-opacity-[0.03] flex items-center justify-center rounded-lg">
+              <Loader2 className="h-6 w-6 animate-spin text-black/10" />
+            </div>
+          ) : null}
+
           <Button
             size="sm"
             variant="ghost"

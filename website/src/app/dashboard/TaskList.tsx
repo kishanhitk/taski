@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -35,6 +35,8 @@ export default function TaskList({ initialTasks }: TaskListProps) {
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
   const { data: session } = useSession();
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+  const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null);
+  const previousTasksRef = useRef<Task[]>(initialTasks);
 
   const handleAddTask = (newTask: Task) => {
     setTasks([...tasks, newTask]);
@@ -55,31 +57,63 @@ export default function TaskList({ initialTasks }: TaskListProps) {
     );
   };
 
-  const onDragEnd = (result: DropResult) => {
+  // const onDragEnd = (result: DropResult) => {
+  //   if (!result.destination) return;
+
+  //   const { source, destination } = result;
+  //   const updatedTasks = Array.from(tasks);
+
+  //   const draggedTask = updatedTasks.find(
+  //     (task) => task.id.toString() === result.draggableId
+  //   );
+
+  //   if (!draggedTask) return;
+
+  //   updatedTasks.splice(updatedTasks.indexOf(draggedTask), 1);
+
+  //   draggedTask.status = destination.droppableId as Column;
+
+  //   updateTaskStatus(draggedTask.id, draggedTask.status);
+
+  //   const destinationTasks = updatedTasks.filter(
+  //     (task) => task.status === destination.droppableId
+  //   );
+  //   const insertIndex = updatedTasks.indexOf(
+  //     destinationTasks[destination.index] || null
+  //   );
+
+  //   updatedTasks.splice(
+  //     insertIndex !== -1 ? insertIndex : updatedTasks.length,
+  //     0,
+  //     draggedTask
+  //   );
+
+  //   setTasks(updatedTasks);
+  // };
+
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
 
     const { source, destination } = result;
     const updatedTasks = Array.from(tasks);
-
     const draggedTask = updatedTasks.find(
       (task) => task.id.toString() === result.draggableId
     );
 
     if (!draggedTask) return;
 
+    // Store the previous state
+    previousTasksRef.current = tasks;
+
+    // Update the task status optimistically
     updatedTasks.splice(updatedTasks.indexOf(draggedTask), 1);
-
     draggedTask.status = destination.droppableId as Column;
-
-    updateTaskStatus(draggedTask.id, draggedTask.status);
-
     const destinationTasks = updatedTasks.filter(
       (task) => task.status === destination.droppableId
     );
     const insertIndex = updatedTasks.indexOf(
       destinationTasks[destination.index] || null
     );
-
     updatedTasks.splice(
       insertIndex !== -1 ? insertIndex : updatedTasks.length,
       0,
@@ -87,6 +121,22 @@ export default function TaskList({ initialTasks }: TaskListProps) {
     );
 
     setTasks(updatedTasks);
+    setUpdatingTaskId(draggedTask.id);
+
+    try {
+      await updateTaskStatus(draggedTask.id, draggedTask.status);
+      // Show success indicator
+      setTimeout(() => setUpdatingTaskId(null), 2000);
+    } catch (error) {
+      // Revert to previous state on error
+      setTasks(previousTasksRef.current);
+      setUpdatingTaskId(null);
+      toast({
+        title: "Error",
+        description: "Failed to update task status. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const updateTaskStatus = async (taskId: number, newStatus: Column) => {
@@ -163,6 +213,7 @@ export default function TaskList({ initialTasks }: TaskListProps) {
                         >
                           {(provided) => (
                             <TaskItem
+                              isUpdating={updatingTaskId === task.id}
                               onOpenEditDialog={handleOpenEditDialog}
                               task={task}
                               provided={provided}
