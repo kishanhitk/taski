@@ -1,9 +1,9 @@
 {
   "name": "backend",
-  "module": "index.ts",
+  "main": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "node src/server.ts",
     "build": "tsc",
     "dev": "nodemon src/app.ts",
     "db:generate": "drizzle-kit generate",
