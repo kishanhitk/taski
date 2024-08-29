@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { AppError } from "../utils/errors";
 
 export const authMiddleware = (
   req: Request,
@@ -8,7 +9,7 @@ export const authMiddleware = (
 ) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
   if (!token) {
-    return res.status(401).json({ error: "No token provided" });
+    return next(new AppError("No token provided", 401));
   }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
@@ -17,6 +18,6 @@ export const authMiddleware = (
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
+    next(new AppError("Invalid token", 401));
   }
 };

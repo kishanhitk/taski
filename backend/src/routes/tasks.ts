@@ -2,70 +2,106 @@ import express from "express";
 import { db } from "../config/database";
 import { tasks } from "../models/schema";
 import { authMiddleware } from "../middleware/auth";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
+import { AppError } from "../utils/errors";
+import { validateTaskStatus } from "../utils/validation";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   try {
     const { title, description, status } = req.body;
+    if (!title || !status) {
+      throw new AppError("Title and status are required", 400);
+    }
+    if (!validateTaskStatus(status)) {
+      throw new AppError("Invalid task status", 400);
+    }
     const [task] = await db
       .insert(tasks)
       .values({ title, description, status, userId: req.userId })
       .returning();
     res.status(201).json(task);
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+    next(error);
   }
 });
 
-router.get("/", async (req, res) => {
-  const userTasks = await db
-    .select()
-    .from(tasks)
-    .where(eq(tasks.userId, req.userId));
-  res.json(userTasks);
+router.get("/", async (req, res, next) => {
+  try {
+    const userTasks = await db
+      .select()
+      .from(tasks)
+      .where(eq(tasks.userId, req.userId));
+    res.json(userTasks);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     const { title, description, status } = req.body;
+    if (!title || !status) {
+      throw new AppError("Title and status are required", 400);
+    }
+    if (!validateTaskStatus(status)) {
+      throw new AppError("Invalid task status", 400);
+    }
     const [updatedTask] = await db
       .update(tasks)
       .set({ title, description, status, updatedAt: new Date() })
-      .where(eq(tasks.id, parseInt(id)))
+      .where(and(eq(tasks.id, parseInt(id)), eq(tasks.userId, req.userId)))
       .returning();
+    if (!updatedTask) {
+      throw new AppError("Task not found or unauthorized", 404);
+    }
     res.json(updatedTask);
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+    next(error);
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    await db.delete(tasks).where(eq(tasks.id, parseInt(id)));
+    const result = await db
+      .delete(tasks)
+      .where(and(eq(tasks.id, parseInt(id)), eq(tasks.userId, req.userId)))
+      .returning();
+    if (result.length === 0) {
+      throw new AppError("Task not found or unauthorized", 404);
+    }
     res.status(204).end();
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+    next(error);
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
+    if (!status) {
+      throw new AppError("Status is required", 400);
+    }
+    if (!validateTaskStatus(status)) {
+      throw new AppError("Invalid task status", 400);
+    }
     const [updatedTask] = await db
       .update(tasks)
       .set({ status, updatedAt: new Date() })
-      .where(eq(tasks.id, parseInt(id)))
+      .where(and(eq(tasks.id, parseInt(id)), eq(tasks.userId, req.userId)))
       .returning();
+    if (!updatedTask) {
+      throw new AppError("Task not found or unauthorized", 404);
+    }
     res.json(updatedTask);
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+    next(error);
   }
 });
 
