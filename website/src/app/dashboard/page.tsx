@@ -1,10 +1,16 @@
 import { redirect } from "next/navigation";
-import UserInfo from "./UserInfo";
 import TaskList from "./TaskList";
 import { auth } from "@/auth";
 import { Task } from "@/types/Task";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard - Taski",
+  description: "Your tasks at a glance",
+};
 
 async function getTasks(token: string): Promise<Task[]> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasks`, {
