@@ -100,14 +100,17 @@ export default function TaskList({ initialTasks }: TaskListProps) {
     }
 
     try {
-      const res = await fetch(`http://127.0.0.1:3000/api/tasks/${taskId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.user.token}`,
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasks/${taskId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.user.token}`,
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
 
       if (!res.ok) {
         throw new Error("Failed to update task status");

@@ -41,12 +41,15 @@ export default function TaskItem({
     }
 
     try {
-      const res = await fetch(`http://127.0.0.1:3000/api/tasks/${task.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session.user.token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasks/${task.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${session.user.token}`,
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to delete task");
 

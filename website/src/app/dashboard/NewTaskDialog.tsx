@@ -68,16 +68,19 @@ export default function NewTaskDialog({
     try {
       let res;
       if (taskToEdit) {
-        res = await fetch(`http://127.0.0.1:3000/api/tasks/${taskToEdit.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.user.token}`,
-          },
-          body: JSON.stringify(taskData),
-        });
+        res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasks/${taskToEdit.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.user.token}`,
+            },
+            body: JSON.stringify(taskData),
+          }
+        );
       } else {
-        res = await fetch("http://127.0.0.1:3000/api/tasks", {
+        res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasks`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

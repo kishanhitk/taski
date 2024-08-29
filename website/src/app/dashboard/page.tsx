@@ -7,7 +7,7 @@ import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
 async function getTasks(token: string): Promise<Task[]> {
-  const res = await fetch("http://127.0.0.1:3000/api/tasks", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tasks`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
