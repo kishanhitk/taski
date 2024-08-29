@@ -24,10 +24,7 @@ This Task Manager is a full-stack web application built with a Next.js frontend 
   - react-beautiful-dnd (@hello-pangea/dnd)
     - To implement drag-and-drop functionality
     - Used the forked version to support latest React versions since the original package is not maintained anymore.
-  - shadcn/ui
-    - Custom UI components
-    - Provides a consistent look and feel across the application
-    - Can be easily customized
+  
 - Backend:
   - Express.js
   - TypeScript
