@@ -73,5 +73,128 @@ describe("Task Routes", () => {
     });
   });
 
-  // Add more tests for PUT, DELETE, and PATCH routes
+  describe("PUT /:id", () => {
+    it("should update an existing task", async () => {
+      const mockTask = {
+        id: 1,
+        title: "Updated Task",
+        status: "in_progress",
+        userId: 1,
+      };
+      (db.update as jest.Mock).mockReturnValue({
+        set: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            returning: jest.fn().mockResolvedValue([mockTask]),
+          }),
+        }),
+      });
+
+      const response = await request(app)
+        .put("/1")
+        .send({ title: "Updated Task", status: "in_progress" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockTask);
+    });
+
+    it("should return 404 if task is not found", async () => {
+      (db.update as jest.Mock).mockReturnValue({
+        set: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            returning: jest.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+
+      const response = await request(app)
+        .put("/999")
+        .send({ title: "Updated Task", status: "in_progress" });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        status: "error",
+        message: "Task not found or unauthorized",
+      });
+    });
+  });
+
+  describe("DELETE /:id", () => {
+    it("should delete an existing task", async () => {
+      (db.delete as jest.Mock).mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          returning: jest.fn().mockResolvedValue([{ id: 1 }]),
+        }),
+      });
+
+      const response = await request(app).delete("/1");
+
+      expect(response.status).toBe(204);
+    });
+
+    it("should return 404 if task is not found", async () => {
+      (db.delete as jest.Mock).mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          returning: jest.fn().mockResolvedValue([]),
+        }),
+      });
+
+      const response = await request(app).delete("/999");
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        status: "error",
+        message: "Task not found or unauthorized",
+      });
+    });
+  });
+
+  describe("PATCH /:id", () => {
+    it("should update the status of an existing task", async () => {
+      const mockTask = { id: 1, title: "Test Task", status: "done", userId: 1 };
+      (db.update as jest.Mock).mockReturnValue({
+        set: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            returning: jest.fn().mockResolvedValue([mockTask]),
+          }),
+        }),
+      });
+
+      const response = await request(app).patch("/1").send({ status: "done" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockTask);
+    });
+
+    it("should return 400 if status is invalid", async () => {
+      const response = await request(app)
+        .patch("/1")
+        .send({ status: "invalid_status" });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        status: "error",
+        message: "Invalid task status",
+      });
+    });
+
+    it("should return 404 if task is not found", async () => {
+      (db.update as jest.Mock).mockReturnValue({
+        set: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            returning: jest.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+
+      const response = await request(app)
+        .patch("/999")
+        .send({ status: "done" });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        status: "error",
+        message: "Task not found or unauthorized",
+      });
+    });
+  });
 });
