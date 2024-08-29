@@ -60,6 +60,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
           const data = await res.json();
           if (res.ok) {
+            // @ts-ignore
             account.token = data.token; // Store the token from the backend
             return true;
           } else {
