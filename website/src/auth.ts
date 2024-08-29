@@ -90,7 +90,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       session.user = {
         ...session.user,
-        // @ts-ignore
+
         ...token.user,
       };
       return session;
