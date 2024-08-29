@@ -6,14 +6,20 @@
     "start": "bun run src/app.ts",
     "dev": "bun --watch run src/app.ts",
     "db:generate": "bun run drizzle-kit generate",
-    "db:migrate": "bun run drizzle-kit migrate"
+    "db:migrate": "bun run drizzle-kit migrate",
+    "test": "jest --verbose"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.0",
+    "@types/jest": "^29.5.12",
     "@types/node": "^22.5.1",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.5.4"
   },
   "peerDependencies": {

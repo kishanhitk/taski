@@ -13,6 +13,7 @@ router.use(authMiddleware);
 router.post("/", async (req, res, next) => {
   try {
     const { title, description, status } = req.body;
+
     if (!title || !status) {
       throw new AppError("Title and status are required", 400);
     }
@@ -30,11 +31,15 @@ router.post("/", async (req, res, next) => {
 });
 
 router.get("/", async (req, res, next) => {
+  if (!req.userId) {
+    throw new AppError("No token provided", 401);
+  }
   try {
     const userTasks = await db
       .select()
       .from(tasks)
       .where(eq(tasks.userId, req.userId));
+
     res.json(userTasks);
   } catch (error) {
     next(error);
@@ -42,6 +47,9 @@ router.get("/", async (req, res, next) => {
 });
 
 router.put("/:id", async (req, res, next) => {
+  if (!req.userId) {
+    throw new AppError("No token provided", 401);
+  }
   try {
     const { id } = req.params;
     const { title, description, status } = req.body;
@@ -66,6 +74,9 @@ router.put("/:id", async (req, res, next) => {
 });
 
 router.delete("/:id", async (req, res, next) => {
+  if (!req.userId) {
+    throw new AppError("No token provided", 401);
+  }
   try {
     const { id } = req.params;
     const result = await db
@@ -82,6 +93,9 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 router.patch("/:id", async (req, res, next) => {
+  if (!req.userId) {
+    throw new AppError("No token provided", 401);
+  }
   try {
     const { id } = req.params;
     const { status } = req.body;
