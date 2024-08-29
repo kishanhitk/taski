@@ -70,13 +70,15 @@ export default function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4"
+          className="bg-white shadow-md rounded-lg px-4 sm:px-8 pt-6 pb-8 mb-4"
         >
-          <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
+          <h1 className="text-xl sm:text-2xl font-bold mb-6 text-center">
+            Register
+          </h1>
           {error && (
             <Alert variant="destructive" className="mb-4">
               <AlertDescription>{error}</AlertDescription>
@@ -89,6 +91,7 @@ export default function Register() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
               required
+              className="w-full"
             />
           </div>
           <div className="mb-4">
@@ -98,6 +101,7 @@ export default function Register() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               required
+              className="w-full"
             />
           </div>
           <div className="mb-6">
@@ -107,22 +111,24 @@ export default function Register() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm Password"
               required
+              className="w-full"
             />
           </div>
           <div className="flex flex-col space-y-4">
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="w-full">
               {isLoading ? "Registering..." : "Register"}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={handleGoogleRegister}
+              className="w-full"
             >
-              <Google className="mr-2" /> Register with Google
+              <Google className="mr-2 h-4 w-4" /> Register with Google
             </Button>
           </div>
         </form>
-        <p className="text-center text-gray-600">
+        <p className="text-center text-sm sm:text-base text-gray-600">
           Already have an account?{" "}
           <Link href="/login" className="text-blue-500 hover:underline">
             Login here
