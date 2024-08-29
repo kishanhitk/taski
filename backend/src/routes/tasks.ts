@@ -54,4 +54,19 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.patch("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const [updatedTask] = await db
+      .update(tasks)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(tasks.id, parseInt(id)))
+      .returning();
+    res.json(updatedTask);
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
 export default router;

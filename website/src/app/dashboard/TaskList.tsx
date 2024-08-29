@@ -7,6 +7,7 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { Task } from "@/types/Task";
+import { useSession } from "next-auth/react";
 
 const columns = [
   { id: "todo", title: "To Do" },
@@ -22,6 +23,7 @@ interface TaskListProps {
 
 export default function TaskList({ initialTasks }: TaskListProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const { data: session } = useSession();
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -39,6 +41,8 @@ export default function TaskList({ initialTasks }: TaskListProps) {
 
     draggedTask.status = destination.droppableId as Column;
 
+    updateTaskStatus(draggedTask.id, draggedTask.status);
+
     const destinationTasks = updatedTasks.filter(
       (task) => task.status === destination.droppableId
     );
@@ -53,6 +57,27 @@ export default function TaskList({ initialTasks }: TaskListProps) {
     );
 
     setTasks(updatedTasks);
+  };
+
+  const updateTaskStatus = async (taskId: number, newStatus: Column) => {
+    if (!session?.user?.token) return;
+
+    try {
+      const res = await fetch(`http://127.0.0.1:3000/api/tasks/${taskId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.user.token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update task status");
+      }
+    } catch (error) {
+      console.error("Error updating task status:", error);
+    }
   };
 
   return (
