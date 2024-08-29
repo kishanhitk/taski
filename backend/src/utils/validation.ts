@@ -9,6 +9,6 @@ export const validatePassword = (password: string): boolean => {
 };
 
 export const validateTaskStatus = (status: string): boolean => {
-  const validStatuses = ["todo", "in_progress", "done"];
+  const validStatuses = ["todo", "inprogress", "done"];
   return validStatuses.includes(status);
 };

@@ -58,7 +58,7 @@ describe("Task Routes", () => {
     it("should return all tasks for the user", async () => {
       const mockTasks = [
         { id: 1, title: "Task 1", status: "todo", userId: 1 },
-        { id: 2, title: "Task 2", status: "in_progress", userId: 1 },
+        { id: 2, title: "Task 2", status: "inprogress", userId: 1 },
       ];
       (db.select as jest.Mock).mockReturnValue({
         from: jest.fn().mockReturnValue({
@@ -78,7 +78,7 @@ describe("Task Routes", () => {
       const mockTask = {
         id: 1,
         title: "Updated Task",
-        status: "in_progress",
+        status: "inprogress",
         userId: 1,
       };
       (db.update as jest.Mock).mockReturnValue({
@@ -91,7 +91,7 @@ describe("Task Routes", () => {
 
       const response = await request(app)
         .put("/1")
-        .send({ title: "Updated Task", status: "in_progress" });
+        .send({ title: "Updated Task", status: "inprogress" });
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockTask);
@@ -108,7 +108,7 @@ describe("Task Routes", () => {
 
       const response = await request(app)
         .put("/999")
-        .send({ title: "Updated Task", status: "in_progress" });
+        .send({ title: "Updated Task", status: "inprogress" });
 
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
