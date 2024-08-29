@@ -22,13 +22,20 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  const tasks = await getTasks(session.user?.token);
+  console.log(session);
+
+  let tasks: Task[] = [];
+  try {
+    tasks = await getTasks(session.user?.token);
+  } catch (error) {
+    console.error("Failed to fetch tasks:", error);
+  }
 
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Task Board</h1>
-        <UserInfo email={session.user?.user?.email} />
+        <UserInfo email={session.user?.email} />
       </div>
       <TaskList initialTasks={tasks} />
     </div>

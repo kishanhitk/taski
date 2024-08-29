@@ -2,10 +2,11 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("kishan@quinence.com");
+  const [password, setPassword] = useState("00000000");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,6 +22,13 @@ export default function Login() {
       console.error(result.error);
     } else {
       router.push("/dashboard");
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    const result = await signIn("google", { callbackUrl: "/dashboard" });
+    if (result?.error) {
+      console.error(result.error);
     }
   };
 
@@ -50,6 +58,9 @@ export default function Login() {
         >
           Login
         </button>
+        <Button type="button" onClick={handleGoogleLogin}>
+          Login with Google
+        </Button>
       </form>
     </div>
   );
