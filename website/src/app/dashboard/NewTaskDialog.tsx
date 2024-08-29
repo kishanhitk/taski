@@ -190,6 +190,7 @@ export default function NewTaskDialog({
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <Calendar
+                  disabled={(date) => date < new Date()}
                   mode="single"
                   selected={dueDate}
                   onSelect={setDueDate}
