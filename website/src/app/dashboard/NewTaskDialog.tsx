@@ -21,6 +21,14 @@ import {
 } from "@/components/ui/select";
 import { taskCategories } from "./TaskList";
 import { toast } from "@/components/ui/use-toast";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
 interface NewTaskDialogProps {
   isOpen: boolean;
@@ -42,6 +50,10 @@ export default function NewTaskDialog({
   const [status, setStatus] = useState<"todo" | "inprogress" | "done">(
     taskToEdit?.status || "todo"
   );
+  const [dueDate, setDueDate] = useState<Date | undefined>(
+    taskToEdit?.dueDate ? new Date(taskToEdit.dueDate) : undefined
+  );
+
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -49,6 +61,7 @@ export default function NewTaskDialog({
       setTitle(taskToEdit.title);
       setDescription(taskToEdit.description ?? "");
       setStatus(taskToEdit.status);
+      setDueDate(taskToEdit.dueDate ? new Date(taskToEdit.dueDate) : undefined);
     }
   }, [taskToEdit]);
 
@@ -63,7 +76,12 @@ export default function NewTaskDialog({
       return;
     }
 
-    const taskData = { title, description, status: status ?? "todo" };
+    const taskData = {
+      title,
+      description,
+      status: status ?? "todo",
+      dueDate: dueDate?.toISOString() ?? null,
+    };
 
     try {
       let res;
@@ -154,6 +172,31 @@ export default function NewTaskDialog({
                 ))}
               </SelectContent>
             </Select>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={`w-full justify-start text-left font-normal ${
+                    !dueDate && "text-muted-foreground"
+                  }`}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dueDate ? (
+                    format(dueDate, "PPP")
+                  ) : (
+                    <span>Pick a due date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={dueDate}
+                  onSelect={setDueDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             <Textarea
               placeholder="Task description"
               value={description}

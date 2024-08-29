@@ -6,4 +6,5 @@ export interface Task {
   userId: number;
   createdAt: Date;
   updatedAt: Date;
+  dueDate: Date | null;
 }

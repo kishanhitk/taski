@@ -14,6 +14,7 @@ export const tasks = pgTable("tasks", {
   description: text("description"),
   status: text("status").notNull(),
   userId: integer("user_id").references(() => users.id),
+  dueDate: timestamp("due_date"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -12,7 +12,7 @@ router.use(authMiddleware);
 
 router.post("/", async (req, res, next) => {
   try {
-    const { title, description, status } = req.body;
+    const { title, description, status, dueDate } = req.body;
 
     if (!title || !status) {
       throw new AppError("Title and status are required", 400);
@@ -20,9 +20,16 @@ router.post("/", async (req, res, next) => {
     if (!validateTaskStatus(status)) {
       throw new AppError("Invalid task status", 400);
     }
+
     const [task] = await db
       .insert(tasks)
-      .values({ title, description, status, userId: req.userId })
+      .values({
+        title,
+        description,
+        status,
+        userId: req.userId,
+        dueDate: new Date(dueDate),
+      })
       .returning();
     res.status(201).json(task);
   } catch (error) {
@@ -52,16 +59,24 @@ router.put("/:id", async (req, res, next) => {
   }
   try {
     const { id } = req.params;
-    const { title, description, status } = req.body;
+    const { title, description, status, dueDate } = req.body;
+
     if (!title || !status) {
       throw new AppError("Title and status are required", 400);
     }
     if (!validateTaskStatus(status)) {
       throw new AppError("Invalid task status", 400);
     }
+
     const [updatedTask] = await db
       .update(tasks)
-      .set({ title, description, status, updatedAt: new Date() })
+      .set({
+        title,
+        description,
+        status,
+        updatedAt: new Date(),
+        dueDate: new Date(dueDate),
+      })
       .where(and(eq(tasks.id, parseInt(id)), eq(tasks.userId, req.userId)))
       .returning();
     if (!updatedTask) {
@@ -98,16 +113,22 @@ router.patch("/:id", async (req, res, next) => {
   }
   try {
     const { id } = req.params;
-    const { status } = req.body;
-    if (!status) {
-      throw new AppError("Status is required", 400);
+    const { status, dueDate } = req.body;
+    if (!status && !dueDate) {
+      throw new AppError("Status or due date is required", 400);
     }
-    if (!validateTaskStatus(status)) {
+    if (status && !validateTaskStatus(status)) {
       throw new AppError("Invalid task status", 400);
     }
+    const updateData: { status?: string; dueDate?: Date; updatedAt: Date } = {
+      updatedAt: new Date(),
+    };
+    if (status) updateData.status = status;
+    if (dueDate) updateData.dueDate = new Date(dueDate);
+
     const [updatedTask] = await db
       .update(tasks)
-      .set({ status, updatedAt: new Date() })
+      .set(updateData)
       .where(and(eq(tasks.id, parseInt(id)), eq(tasks.userId, req.userId)))
       .returning();
     if (!updatedTask) {
