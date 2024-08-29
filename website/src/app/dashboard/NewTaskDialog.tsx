@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,41 +25,76 @@ interface NewTaskDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onAddTask: (task: Task) => void;
+  taskToEdit?: Task | null;
+  onEditTask?: (task: Task) => void;
 }
 
 export default function NewTaskDialog({
   isOpen,
   onClose,
   onAddTask,
+  taskToEdit,
+  onEditTask,
 }: NewTaskDialogProps) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<"todo" | "inprogress" | "done">("todo");
+  const [title, setTitle] = useState(taskToEdit?.title || "");
+  const [description, setDescription] = useState(taskToEdit?.description || "");
+  const [status, setStatus] = useState<"todo" | "inprogress" | "done">(
+    taskToEdit?.status || "todo"
+  );
   const { data: session } = useSession();
+
+  useEffect(() => {
+    if (taskToEdit) {
+      setTitle(taskToEdit.title);
+      setDescription(taskToEdit.description ?? "");
+      setStatus(taskToEdit.status);
+    }
+  }, [taskToEdit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.user?.token) return;
 
+    const taskData = { title, description, status: status ?? "todo" };
+
     try {
-      const res = await fetch("http://127.0.0.1:3000/api/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.user.token}`,
-        },
-        body: JSON.stringify({ title, description, status: status ?? "todo" }),
-      });
+      let res;
+      if (taskToEdit) {
+        res = await fetch(`http://127.0.0.1:3000/api/tasks/${taskToEdit.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.user.token}`,
+          },
+          body: JSON.stringify(taskData),
+        });
+      } else {
+        res = await fetch("http://127.0.0.1:3000/api/tasks", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.user.token}`,
+          },
+          body: JSON.stringify(taskData),
+        });
+      }
 
-      if (!res.ok) throw new Error("Failed to create task");
+      if (!res.ok)
+        throw new Error(
+          taskToEdit ? "Failed to update task" : "Failed to create task"
+        );
 
-      const newTask: Task = await res.json();
-      onAddTask(newTask);
+      const task: Task = await res.json();
+      taskToEdit ? onEditTask?.(task) : onAddTask(task);
       onClose();
       setTitle("");
       setDescription("");
+      setStatus("todo");
     } catch (error) {
-      console.error("Error creating task:", error);
+      console.error(
+        taskToEdit ? "Error updating task:" : "Error creating task:",
+        error
+      );
     }
   };
 

@@ -29,19 +29,25 @@ export default function TaskList({ initialTasks }: TaskListProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
   const { data: session } = useSession();
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
   const handleAddTask = (newTask: Task) => {
     setTasks([...tasks, newTask]);
+  };
+
+  const handleDeleteTask = (taskId: number) => {
+    setTasks(tasks.filter((task) => task.id !== taskId));
+  };
+
+  const handleOpenEditDialog = (task: Task) => {
+    setTaskToEdit(task);
+    setIsNewTaskDialogOpen(true);
   };
 
   const handleEditTask = (editedTask: Task) => {
     setTasks(
       tasks.map((task) => (task.id === editedTask.id ? editedTask : task))
     );
-  };
-
-  const handleDeleteTask = (taskId: number) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -110,7 +116,10 @@ export default function TaskList({ initialTasks }: TaskListProps) {
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex space-x-4">
           {taskCategories.map((column) => (
-            <div key={column.id} className="bg-white/10 p-4 rounded-lg w-1/3">
+            <div
+              key={column.id}
+              className="bg-black/5 shadow-md p-4 rounded-lg w-1/3"
+            >
               <h2 className="text-lg font-semibold mb-4">{column.title}</h2>
               <Droppable droppableId={column.id}>
                 {(provided) => (
@@ -129,6 +138,7 @@ export default function TaskList({ initialTasks }: TaskListProps) {
                         >
                           {(provided) => (
                             <TaskItem
+                              onOpenEditDialog={handleOpenEditDialog}
                               task={task}
                               provided={provided}
                               onEdit={handleEditTask}
@@ -147,8 +157,13 @@ export default function TaskList({ initialTasks }: TaskListProps) {
       </DragDropContext>
       <NewTaskDialog
         isOpen={isNewTaskDialogOpen}
-        onClose={() => setIsNewTaskDialogOpen(false)}
+        onClose={() => {
+          setIsNewTaskDialogOpen(false);
+          setTaskToEdit(null);
+        }}
         onAddTask={handleAddTask}
+        taskToEdit={taskToEdit}
+        onEditTask={handleEditTask}
       />
     </>
   );

@@ -16,6 +16,7 @@ interface TaskItemProps {
   provided: any;
   onEdit: (task: Task) => void;
   onDelete: (taskId: number) => void;
+  onOpenEditDialog: (task: Task) => void;
 }
 
 export default function TaskItem({
@@ -23,6 +24,7 @@ export default function TaskItem({
   provided,
   onEdit,
   onDelete,
+  onOpenEditDialog,
 }: TaskItemProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { data: session } = useSession();
@@ -52,7 +54,7 @@ export default function TaskItem({
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
-        className="bg-white/20 p-2 rounded shadow flex items-center justify-between"
+        className="bg-white/90 p-2 rounded shadow flex items-center justify-between"
       >
         <span>{task.title}</span>
         <div className="space-x-1">
@@ -66,9 +68,7 @@ export default function TaskItem({
           <Button
             size="icon"
             variant="ghost"
-            onClick={() => {
-              /* Implement edit functionality */
-            }}
+            onClick={() => onOpenEditDialog(task)}
           >
             <Pencil className="h-4 w-4" />
           </Button>
