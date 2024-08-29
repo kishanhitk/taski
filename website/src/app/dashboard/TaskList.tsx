@@ -13,6 +13,14 @@ import { Plus } from "lucide-react";
 import NewTaskDialog from "./NewTaskDialog";
 import TaskItem from "./TaskItem";
 import { toast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 export const taskCategories = [
   { id: "todo", title: "To Do", color: "bg-red-100 dark:bg-red-900" },
@@ -37,6 +45,21 @@ export default function TaskList({ initialTasks }: TaskListProps) {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null);
   const previousTasksRef = useRef<Task[]>(initialTasks);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"title" | "createdAt">("createdAt");
+  const filteredAndSortedTasks = tasks
+    .filter((task) =>
+      task.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortBy === "title") {
+        return a.title.localeCompare(b.title);
+      } else {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      }
+    });
 
   const handleAddTask = (newTask: Task) => {
     setTasks([...tasks, newTask]);
@@ -56,40 +79,6 @@ export default function TaskList({ initialTasks }: TaskListProps) {
       tasks.map((task) => (task.id === editedTask.id ? editedTask : task))
     );
   };
-
-  // const onDragEnd = (result: DropResult) => {
-  //   if (!result.destination) return;
-
-  //   const { source, destination } = result;
-  //   const updatedTasks = Array.from(tasks);
-
-  //   const draggedTask = updatedTasks.find(
-  //     (task) => task.id.toString() === result.draggableId
-  //   );
-
-  //   if (!draggedTask) return;
-
-  //   updatedTasks.splice(updatedTasks.indexOf(draggedTask), 1);
-
-  //   draggedTask.status = destination.droppableId as Column;
-
-  //   updateTaskStatus(draggedTask.id, draggedTask.status);
-
-  //   const destinationTasks = updatedTasks.filter(
-  //     (task) => task.status === destination.droppableId
-  //   );
-  //   const insertIndex = updatedTasks.indexOf(
-  //     destinationTasks[destination.index] || null
-  //   );
-
-  //   updatedTasks.splice(
-  //     insertIndex !== -1 ? insertIndex : updatedTasks.length,
-  //     0,
-  //     draggedTask
-  //   );
-
-  //   setTasks(updatedTasks);
-  // };
 
   const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
@@ -188,6 +177,26 @@ export default function TaskList({ initialTasks }: TaskListProps) {
           <Plus className="mr-2 h-4 w-4" /> Add Task
         </Button>
       </div>
+      <div className="flex space-x-4 mb-4">
+        <Input
+          placeholder="Search tasks..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-sm"
+        />
+        <Select
+          value={sortBy}
+          onValueChange={(value: "title" | "createdAt") => setSortBy(value)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="title">Title</SelectItem>
+            <SelectItem value="createdAt">Date Created</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {taskCategories.map((column) => (
@@ -203,7 +212,7 @@ export default function TaskList({ initialTasks }: TaskListProps) {
                     ref={provided.innerRef}
                     className="space-y-2 min-h-[100px]"
                   >
-                    {tasks
+                    {filteredAndSortedTasks
                       .filter((task) => task.status === column.id)
                       .map((task, index) => (
                         <Draggable
