@@ -81,6 +81,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           name: user.name,
           image: user.image,
+          // @ts-ignore
           token: user.token || account?.token,
         };
       }
@@ -89,6 +90,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       session.user = {
         ...session.user,
+        // @ts-ignore
         ...token.user,
       };
       return session;
