@@ -20,8 +20,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
         const data = await res.json();
 
-        console.log("DATA", data);
-
         if (res.ok && data) {
           return {
             id: data.user.id,
@@ -61,7 +59,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
           );
           const data = await res.json();
-          console.log("Google sign in data:", data);
           if (res.ok) {
             account.token = data.token; // Store the token from the backend
             return true;

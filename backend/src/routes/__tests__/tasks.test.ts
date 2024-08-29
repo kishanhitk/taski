@@ -12,7 +12,7 @@ jest.mock("../../middleware/auth");
 const app = express();
 app.use(express.json());
 app.use(taskRoutes);
-app.use(errorHandler); // Make sure this line is present
+app.use(errorHandler);
 
 describe("Task Routes", () => {
   beforeEach(() => {
