@@ -2,8 +2,9 @@ import { redirect } from "next/navigation";
 import UserInfo from "./UserInfo";
 import TaskList from "./TaskList";
 import { auth } from "@/auth";
+import { Task } from "@/types/Task";
 
-async function getTasks(token: string) {
+async function getTasks(token: string): Promise<Task[]> {
   const res = await fetch("http://127.0.0.1:3000/api/tasks", {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -21,7 +22,7 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  const tasks = await getTasks(session.user.token);
+  const tasks = await getTasks(session.user?.token);
 
   return (
     <div className="p-4">
