@@ -13,6 +13,10 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", message: "Server is healthy" });
+});
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
