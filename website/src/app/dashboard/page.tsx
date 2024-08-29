@@ -38,7 +38,7 @@ export default async function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto pt-10">
       <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin" />}>
         <TaskList initialTasks={tasks} />
       </Suspense>
