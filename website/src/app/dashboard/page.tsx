@@ -28,7 +28,7 @@ export default async function Dashboard() {
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Task Board</h1>
-        <UserInfo email={session.user.email} />
+        <UserInfo email={session.user?.user?.email} />
       </div>
       <TaskList initialTasks={tasks} />
     </div>
