@@ -11,7 +11,7 @@ export default function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <nav className="bg-white p-4">
+    <nav className="bg-white py-5">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
           <span className="text-3xl font-light">Taski</span>
