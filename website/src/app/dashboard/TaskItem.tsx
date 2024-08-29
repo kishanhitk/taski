@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil, Trash2, Info } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { toast } from "@/components/ui/use-toast";
 
 interface TaskItemProps {
   task: Task;
@@ -30,7 +31,14 @@ export default function TaskItem({
   const { data: session } = useSession();
 
   const handleDelete = async () => {
-    if (!session?.user?.token) return;
+    if (!session?.user?.token) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete tasks.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const res = await fetch(`http://127.0.0.1:3000/api/tasks/${task.id}`, {
@@ -43,8 +51,17 @@ export default function TaskItem({
       if (!res.ok) throw new Error("Failed to delete task");
 
       onDelete(task.id);
+      toast({
+        title: "Success",
+        description: "Task deleted successfully.",
+      });
     } catch (error) {
       console.error("Error deleting task:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete task. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -54,35 +71,37 @@ export default function TaskItem({
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
-        className="bg-white/90 p-2 rounded shadow flex items-center justify-between"
+        className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg"
       >
-        <span>{task.title}</span>
-        <div className="space-x-1">
+        <span className="font-medium truncate">{task.title}</span>
+        <div className="flex space-x-1">
           <Button
-            size="icon"
+            size="sm"
             variant="ghost"
             onClick={() => setIsDetailsOpen(true)}
           >
             <Info className="h-4 w-4" />
           </Button>
           <Button
-            size="icon"
+            size="sm"
             variant="ghost"
             onClick={() => onOpenEditDialog(task)}
           >
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="ghost" onClick={handleDelete}>
+          <Button size="sm" variant="ghost" onClick={handleDelete}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </li>
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{task.title}</DialogTitle>
           </DialogHeader>
-          <p>{task.description}</p>
+          <p className="mt-2">
+            {task.description || "No description provided."}
+          </p>
         </DialogContent>
       </Dialog>
     </>

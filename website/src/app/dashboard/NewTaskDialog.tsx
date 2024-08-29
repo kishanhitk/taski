@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { taskCategories } from "./TaskList";
+import { toast } from "@/components/ui/use-toast";
 
 interface NewTaskDialogProps {
   isOpen: boolean;
@@ -53,7 +54,14 @@ export default function NewTaskDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session?.user?.token) return;
+    if (!session?.user?.token) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to perform this action.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const taskData = { title, description, status: status ?? "todo" };
 
@@ -79,10 +87,11 @@ export default function NewTaskDialog({
         });
       }
 
-      if (!res.ok)
+      if (!res.ok) {
         throw new Error(
           taskToEdit ? "Failed to update task" : "Failed to create task"
         );
+      }
 
       const task: Task = await res.json();
       taskToEdit ? onEditTask?.(task) : onAddTask(task);
@@ -90,19 +99,32 @@ export default function NewTaskDialog({
       setTitle("");
       setDescription("");
       setStatus("todo");
+      toast({
+        title: "Success",
+        description: taskToEdit
+          ? "Task updated successfully."
+          : "Task created successfully.",
+      });
     } catch (error) {
       console.error(
         taskToEdit ? "Error updating task:" : "Error creating task:",
         error
       );
+      toast({
+        title: "Error",
+        description: taskToEdit
+          ? "Failed to update task. Please try again."
+          : "Failed to create task. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Task</DialogTitle>
+          <DialogTitle>{taskToEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -129,15 +151,14 @@ export default function NewTaskDialog({
                 ))}
               </SelectContent>
             </Select>
-
             <Textarea
               placeholder="Task description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <DialogFooter className="mt-4">
-            <Button type="submit">Add Task</Button>
+          <DialogFooter className="mt-6">
+            <Button type="submit">{taskToEdit ? "Update" : "Add"} Task</Button>
           </DialogFooter>
         </form>
       </DialogContent>

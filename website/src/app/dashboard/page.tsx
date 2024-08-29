@@ -3,6 +3,8 @@ import UserInfo from "./UserInfo";
 import TaskList from "./TaskList";
 import { auth } from "@/auth";
 import { Task } from "@/types/Task";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 
 async function getTasks(token: string): Promise<Task[]> {
   const res = await fetch("http://127.0.0.1:3000/api/tasks", {
@@ -22,15 +24,18 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  const tasks = await getTasks(session.user?.token);
+  let tasks: Task[] = [];
+  try {
+    tasks = await getTasks(session.user?.token);
+  } catch (error) {
+    console.error("Failed to fetch tasks:", error);
+  }
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Task Board</h1>
-        <UserInfo email={session.user?.user?.email} />
-      </div>
-      <TaskList initialTasks={tasks} />
+    <div className="container mx-auto">
+      <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin" />}>
+        <TaskList initialTasks={tasks} />
+      </Suspense>
     </div>
   );
 }

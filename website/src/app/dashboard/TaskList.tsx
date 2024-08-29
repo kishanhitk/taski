@@ -12,11 +12,16 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import NewTaskDialog from "./NewTaskDialog";
 import TaskItem from "./TaskItem";
+import { toast } from "@/components/ui/use-toast";
 
 export const taskCategories = [
-  { id: "todo", title: "To Do" },
-  { id: "inprogress", title: "In Progress" },
-  { id: "done", title: "Done" },
+  { id: "todo", title: "To Do", color: "bg-red-100 dark:bg-red-900" },
+  {
+    id: "inprogress",
+    title: "In Progress",
+    color: "bg-yellow-100 dark:bg-yellow-900",
+  },
+  { id: "done", title: "Done", color: "bg-green-100 dark:bg-green-900" },
 ] as const;
 
 type Column = (typeof taskCategories)[number]["id"];
@@ -85,7 +90,14 @@ export default function TaskList({ initialTasks }: TaskListProps) {
   };
 
   const updateTaskStatus = async (taskId: number, newStatus: Column) => {
-    if (!session?.user?.token) return;
+    if (!session?.user?.token) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update tasks.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const res = await fetch(`http://127.0.0.1:3000/api/tasks/${taskId}`, {
@@ -100,25 +112,35 @@ export default function TaskList({ initialTasks }: TaskListProps) {
       if (!res.ok) {
         throw new Error("Failed to update task status");
       }
+
+      toast({
+        title: "Success",
+        description: "Task status updated successfully.",
+      });
     } catch (error) {
       console.error("Error updating task status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update task status. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Tasks</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-light">My Tasks</h2>
         <Button onClick={() => setIsNewTaskDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Task
         </Button>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex space-x-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {taskCategories.map((column) => (
             <div
               key={column.id}
-              className="bg-black/5 shadow-md p-4 rounded-lg w-1/3"
+              className={`${column.color} shadow-lg rounded-lg p-4`}
             >
               <h2 className="text-lg font-semibold mb-4">{column.title}</h2>
               <Droppable droppableId={column.id}>
