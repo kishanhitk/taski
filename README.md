@@ -10,17 +10,36 @@ This Task Manager is a full-stack web application built with a Next.js frontend 
 - Drag-and-drop interface for task management
 - Responsive design for various screen sizes
 
-## Tech Stack
+## Tech Stack and reasons for choosing them
 - Frontend:
   - Next.js
+    - Provides SSR support
+    - Good ecosystem for building React applications
   - React
+    - Good ecosystem for building UI components
   - TypeScript
   - Tailwind CSS
+    - Makes styling easier and faster
+    - Since it's utility-first, it's easy to customize and maintain
   - react-beautiful-dnd (@hello-pangea/dnd)
+    - To implement drag-and-drop functionality
+    - Used the forked version to support latest React versions since the original package is not maintained anymore.
+  - shadcn/ui
+    - Custom UI components
+    - Provides a consistent look and feel across the application
+    - Can be easily customized
 - Backend:
   - Express.js
   - TypeScript
   - PostgreSQL with Drizzle ORM, hosted on Neon
+    - The best all-in-one database 
+    - Drizzle ORM is simple and easy-to-use, and lot faster than other ORMs. Good TypeScript support.
+    - Neon, since it was the only free PostgreSQL hosting service that I could find easily.
+  - Bun
+    - Fast all-in-one JavaScript runtime
+    - Comes with many useful features out of the box
+    - Good DX
+
 - Authentication:
   - NextAuth.js (frontend)
   - Custom JWT implementation (backend)
