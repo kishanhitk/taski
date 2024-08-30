@@ -79,8 +79,8 @@ export default function TaskItem({
         {...provided.dragHandleProps}
         className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg relative"
       >
-        <div>
-          <p className="font-medium truncate">{task.title}</p>
+        <div className="flex-grow overflow-hidden mr-2">
+          <p className="font-medium truncate max-w-full">{task.title}</p>
           {task.dueDate ? (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Due in{" "}
@@ -90,7 +90,7 @@ export default function TaskItem({
             </p>
           ) : null}
         </div>
-        <div className="flex space-x-1">
+        <div className="flex space-x-1 flex-shrink-0">
           {isUpdating ? (
             <div className="absolute inset-0 bg-black bg-opacity-[0.03] flex items-center justify-center rounded-lg">
               <Loader2 className="h-6 w-6 animate-spin text-black/10" />
