@@ -9,6 +9,10 @@ export const metadata: Metadata = {
 };
 
 const page = () => {
+  const healthStatus = fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/health`
+  ).then((res) => res.json());
+
   return <Home />;
 };
 

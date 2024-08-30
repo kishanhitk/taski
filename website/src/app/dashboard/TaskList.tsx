@@ -46,7 +46,9 @@ export default function TaskList({ initialTasks }: TaskListProps) {
   const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null);
   const previousTasksRef = useRef<Task[]>(initialTasks);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<"title" | "createdAt">("createdAt");
+  const [sortBy, setSortBy] = useState<"title" | "createdAt" | "dueDate">(
+    "dueDate"
+  );
   const filteredAndSortedTasks = tasks
     .filter((task) =>
       task.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -54,10 +56,15 @@ export default function TaskList({ initialTasks }: TaskListProps) {
     .sort((a, b) => {
       if (sortBy === "title") {
         return a.title.localeCompare(b.title);
-      } else {
+      } else if (sortBy === "createdAt") {
         return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
+      } else {
+        // If dueDate is not set, move it to the end
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       }
     });
 
@@ -192,6 +199,7 @@ export default function TaskList({ initialTasks }: TaskListProps) {
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="dueDate">Due Date</SelectItem>
             <SelectItem value="title">Title</SelectItem>
             <SelectItem value="createdAt">Date Created</SelectItem>
           </SelectContent>

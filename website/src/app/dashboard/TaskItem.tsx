@@ -11,6 +11,7 @@ import {
 import { Pencil, Trash2, Info, Check, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "@/components/ui/use-toast";
+import { formatDistance } from "date-fns";
 
 interface TaskItemProps {
   task: Task;
@@ -78,7 +79,17 @@ export default function TaskItem({
         {...provided.dragHandleProps}
         className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg relative"
       >
-        <span className="font-medium truncate">{task.title}</span>
+        <div>
+          <p className="font-medium truncate">{task.title}</p>
+          {task.dueDate ? (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Due in{" "}
+              {formatDistance(new Date(task.dueDate), new Date(), {
+                addSuffix: true,
+              })}
+            </p>
+          ) : null}
+        </div>
         <div className="flex space-x-1">
           {isUpdating ? (
             <div className="absolute inset-0 bg-black bg-opacity-[0.03] flex items-center justify-center rounded-lg">

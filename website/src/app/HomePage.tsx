@@ -54,6 +54,21 @@ export default function Home() {
           description="Access your tasks from any device, anytime, anywhere"
         />
       </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="mt-8 text-center max-w-2xl"
+      >
+        <p className="text-sm text-gray-500 italic bg-black/5 rounded-3xl p-4">
+          <span className="text-red-500">Disclaimer: </span>
+          Due to the backend code being deployed on the free tier of Render, it
+          may enter a sleep mode after inactivity. If you encounter any unusual
+          behaviour, please refresh the page and access the website after
+          approximately 50 seconds to ensure the backend server returns to a
+          normal state.
+        </p>
+      </motion.div>
     </main>
   );
 }
