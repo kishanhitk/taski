@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Google from "@/components/icons/GoogleLogo";
+import { Loader2 } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,7 +24,11 @@ export default function Login() {
   }, [status, router]);
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-screen w-screen flex-col items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-black/10" />
+      </div>
+    );
   }
 
   if (status === "authenticated") {
