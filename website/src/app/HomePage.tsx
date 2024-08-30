@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center container pt-12 md:pt-0 ">
+    <main className="flex min-h-screen flex-col items-center justify-center container py-12 md:py-20 ">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -31,7 +31,17 @@ export default function Home() {
           </Link>
         </div>
       </motion.div>
-
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="w-full max-w-4xl mb-6 "
+      >
+        <video autoPlay loop muted playsInline className="w-full rounded-lg">
+          <source src="/taski-demo.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -54,6 +64,7 @@ export default function Home() {
           description="Access your tasks from any device, anytime, anywhere"
         />
       </motion.div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
