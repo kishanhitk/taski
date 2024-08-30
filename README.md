@@ -2,13 +2,23 @@
 
 ## Overview
 This Task Manager is a full-stack web application built with a Next.js frontend and an Express.js backend. It allows users to create, organize, and manage tasks across different stages of completion.
-
+## Screenshots
+- Home page
+![Homepage](image.png)
+- Dashboard
+![Dashboard](image-1.png)
+- Add task
+![Add task](image-2.png)
 ## Features
-- User authentication (register, login)
-- Google OAuth sign-in
+- User authentication (register, login). Google OAuth sign-in
 - Create, read, update, and delete tasks
-- Drag-and-drop interface for task management
-- Responsive design for various screen sizes
+- Add due dates to tasks.
+- Drag-and-drop interface for task management. Quickly move tasks between different stages of completion.
+- Search tasks by title.
+- Sort tasks by due date, creation date, and title.
+- Responsive design for various screen sizes. Works well on mobile, tablet, and desktop.
+- Clean UI with sleek animations.
+- Super fast navigation.
 
 ## Tech Stack and reasons for choosing them
 - Frontend:

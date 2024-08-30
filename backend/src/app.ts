@@ -19,7 +19,7 @@ app.get("/health", (req, res) => {
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3100;
 
 app.listen(PORT, () => {
   console.log(
