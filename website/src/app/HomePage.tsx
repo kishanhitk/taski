@@ -2,10 +2,30 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
+import { cn } from "@/lib/utils";
+import { ArrowUpRightIcon } from "lucide-react";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center container py-12 md:py-20 ">
+      <motion.a
+        initial={{ opacity: 0, filter: "blur(20px)" }}
+        animate={{ opacity: 1, filter: "blur(0px)" }}
+        transition={{ duration: 0.4, delay: 2 }}
+        href="https://github.com/kishanhitk/taski"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(
+          "group rounded-full border border-black/5 bg-neutral-100 text-base text-black transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 mb-10"
+        )}
+      >
+        <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300">
+          <span>✨ Open Sourced on GitHub</span>
+          <ArrowUpRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+        </AnimatedShinyText>
+      </motion.a>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
